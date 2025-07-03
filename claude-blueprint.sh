@@ -41,9 +41,9 @@ if [ ! -d ".claude" ]; then
     mkdir -p ".claude"
 fi
 
-# Create project-specific CLAUDE.md
+# Create project-specific CLAUDE.md in project root
 echo -e "${BLUE}📝 Setting up project CLAUDE.md...${NC}"
-cat > ".claude/CLAUDE.md" << EOF
+cat > "CLAUDE.md" << EOF
 # Claude Code Configuration for $TEMPLATE Project
 
 #include $SCRIPT_DIR/.claude/CLAUDE.md
@@ -72,12 +72,12 @@ cat > ".claude/CLAUDE.md" << EOF
 2. <!-- TODO: セットアップ手順2 -->
 3. <!-- TODO: セットアップ手順3 -->
 EOF
-echo -e "${GREEN}✅ Created: .claude/CLAUDE.md${NC}"
+echo -e "${GREEN}✅ Created: CLAUDE.md${NC}"
 
 # Copy template-specific files
 if [ -f "$SCRIPT_DIR/templates/$TEMPLATE/style-guide.md" ]; then
-    cp "$SCRIPT_DIR/templates/$TEMPLATE/style-guide.md" ".claude/style-guide.md"
-    echo -e "${GREEN}✅ Copied: .claude/style-guide.md${NC}"
+    cp "$SCRIPT_DIR/templates/$TEMPLATE/style-guide.md" ".claude/coding-guide.md"
+    echo -e "${GREEN}✅ Copied: .claude/coding-guide.md${NC}"
 fi
 
 # Create docs directory and copy templates

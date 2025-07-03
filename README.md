@@ -69,8 +69,10 @@ claude-blueprint
 - 未インストールツールの公式インストール手順を表示
 
 ### プロジェクトテンプレート
-- **hono-sveltekit**: Hono + SvelteKit + Turso + Cloud Run/Cloudflare構成
+- **hono-sveltekit**: Hono + SvelteKit + 関数型プログラミング指針
 - **rails**: Ruby on Rails構成
+- **TDD支援**: t-wada方式のテスト駆動開発ガイドライン
+- **関数型コーディングガイド**: 純粋関数・イミュータブル・副作用分離
 - プロジェクト構成用ドキュメントテンプレート
 - タスク管理用TODO.md（pcheck対応）
 
