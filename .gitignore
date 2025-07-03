@@ -24,6 +24,13 @@ Thumbs.db
 # Local settings that shouldn't be shared
 settings.local.json
 
+# Claude Code personal files (keep CLAUDE.md and commands/)
+.claude/.credentials.json
+.claude/projects/
+.claude/statsig/
+.claude/todos/
+.claude/settings.local.json
+
 # Temporary files
 *.tmp
 *.temp

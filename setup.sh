@@ -3,13 +3,10 @@
 # Claude Code Dotfiles Setup Script
 # Usage: 
 #   ./setup.sh          - Setup global configuration
-#   ./setup.sh project [framework] - Setup project-specific configuration
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ACTION="${1:-global}"
-FRAMEWORK="$2"
 
 # Colors for output
 RED='\033[0;31m'
@@ -81,11 +78,18 @@ setup_global() {
         fi
     done
     
-    # Setup scripts
-    if [ ! -d "$HOME/scripts" ]; then
-        mkdir -p "$HOME/scripts"
-    fi
-    create_symlink "$SCRIPT_DIR/scripts/notify-pushover.sh" "$HOME/scripts/notify-pushover.sh"
+    # Setup common hooks
+    echo -e "\n${BLUE}🪝 Setting up common hooks...${NC}"
+    mkdir -p "$HOME/.claude/hooks"
+    
+    # Link common hook files
+    for hook_file in "$SCRIPT_DIR/common/hooks"/*; do
+        if [ -f "$hook_file" ]; then
+            hook_name=$(basename "$hook_file")
+            create_symlink "$hook_file" "$HOME/.claude/hooks/$hook_name"
+        fi
+    done
+    
     
     # Create .env.local template if it doesn't exist
     if [ ! -f "$HOME/.env.local" ]; then
@@ -106,9 +110,7 @@ EOF
     echo "   • Run: /hooks in Claude Code"
     echo "   • Select: 3. Notification - When notifications are sent"
     echo "   • Add hook command:"
-    echo -e "${YELLOW}     if [ -x ~/scripts/notify-pushover.sh ]; then"
-    echo "       jq -r '.message' | xargs ~/scripts/notify-pushover.sh \"Claude\""
-    echo -e "     fi${NC}"
+    echo -e "${YELLOW}     jq -r '.message' | xargs ~/.claude/hooks/notify-pushover.sh \"Claude\"${NC}"
     echo ""
     echo "2. Edit ~/.env.local with your Pushover API keys"
     echo ""
@@ -117,165 +119,5 @@ EOF
     echo -e "${GREEN}✅ Global setup completed successfully!${NC}"
 }
 
-# Project setup function
-setup_project() {
-    local framework="$1"
-    
-    if [ -z "$framework" ]; then
-        echo -e "${RED}❌ Error: Framework not specified${NC}"
-        echo ""
-        echo "Usage: $0 project <framework>"
-        echo ""
-        echo "Available frameworks:"
-        for dir in "$SCRIPT_DIR/frameworks"/*; do
-            if [ -d "$dir" ]; then
-                echo "  • $(basename "$dir")"
-            fi
-        done
-        exit 1
-    fi
-    
-    # Check if framework exists
-    if [ ! -d "$SCRIPT_DIR/frameworks/$framework" ]; then
-        echo -e "${RED}❌ Error: Framework '$framework' not found${NC}"
-        echo ""
-        echo "Available frameworks:"
-        for dir in "$SCRIPT_DIR/frameworks"/*; do
-            if [ -d "$dir" ]; then
-                echo "  • $(basename "$dir")"
-            fi
-        done
-        exit 1
-    fi
-    
-    echo -e "${BLUE}🚀 Claude Code Project Setup${NC}"
-    echo "========================================"
-    echo "Framework: $framework"
-    echo "Target: $(pwd)"
-    echo ""
-    
-    # Create .claude directory
-    if [ ! -d ".claude" ]; then
-        echo -e "${BLUE}📁 Creating .claude directory...${NC}"
-        mkdir -p ".claude"
-    fi
-    
-    # Create project-specific CLAUDE.md
-    echo -e "${BLUE}📝 Setting up project CLAUDE.md...${NC}"
-    cat > ".claude/CLAUDE.md" << EOF
-# Claude Code Configuration for $framework Project
-
-#include $SCRIPT_DIR/.claude/CLAUDE.md
-#include $SCRIPT_DIR/frameworks/$framework/CLAUDE.md
-
-## Project-Specific Configuration
-
-<!-- TODO: プロジェクト情報を記入してください -->
-**Project Name**: <!-- TODO: プロジェクト名を記入 -->
-**Description**: <!-- TODO: プロジェクトの説明を記入 -->
-**Framework**: $framework
-
-### Project Context
-
-<!-- TODO: 以下の項目を記入してください -->
-**Purpose**: <!-- TODO: プロジェクトの目的を記述 -->
-**Key Features**: 
-- <!-- TODO: 主要機能1 -->
-- <!-- TODO: 主要機能2 -->
-- <!-- TODO: 主要機能3 -->
-
-### Quick Start
-
-<!-- TODO: プロジェクト固有のセットアップ手順を記入 -->
-1. <!-- TODO: セットアップ手順1 -->
-2. <!-- TODO: セットアップ手順2 -->
-3. <!-- TODO: セットアップ手順3 -->
-EOF
-    echo -e "${GREEN}✅ Created: .claude/CLAUDE.md${NC}"
-    
-    # Copy framework-specific files
-    if [ -f "$SCRIPT_DIR/frameworks/$framework/style-guide.md" ]; then
-        cp "$SCRIPT_DIR/frameworks/$framework/style-guide.md" ".claude/style-guide.md"
-        echo -e "${GREEN}✅ Copied: .claude/style-guide.md${NC}"
-    fi
-    
-    # Create docs directory and copy templates
-    echo -e "${BLUE}📚 Setting up documentation templates...${NC}"
-    mkdir -p "docs"
-    
-    for doc in SPECIFICATION IMPROVEMENT_HISTORY HISTORICAL_CONTEXT TROUBLESHOOTING; do
-        if [ -f "$SCRIPT_DIR/common/docs/$doc.md" ]; then
-            cp "$SCRIPT_DIR/common/docs/$doc.md" "docs/$doc.md"
-        fi
-    done
-    echo -e "${GREEN}✅ Documentation templates copied to docs/${NC}"
-    
-    # Create TODO.md
-    echo -e "${BLUE}📋 Setting up TODO.md...${NC}"
-    cat > "TODO.md" << 'EOF'
-# Project TODO List
-
-This file is managed by `pcheck` tool for systematic task tracking.
-
-## Setup
-
-- [ ] Configure project-specific settings in .claude/CLAUDE.md
-- [ ] Update docs/SPECIFICATION.md with project requirements
-- [ ] Set up development environment
-- [ ] Configure testing framework
-
-## Development
-
-- [ ] Implement core features
-- [ ] Add comprehensive tests
-- [ ] Performance optimization
-
----
-
-**Task Management**:
-- Use `pcheck` to view tasks
-- Use `pcheck add -m "Description"` to add tasks
-- Use `pcheck check <id>` to toggle completion
-EOF
-    echo -e "${GREEN}✅ Created: TODO.md${NC}"
-    
-    # Create tmp directory
-    mkdir -p "tmp"
-    echo -e "${GREEN}✅ Created: tmp/ (for testing and validation)${NC}"
-    
-    # Framework-specific recommendations
-    case "$framework" in
-        "hono")
-            echo -e "\n${BLUE}🔧 Hono-specific recommendations:${NC}"
-            echo "   • Ensure Deno is installed"
-            echo "   • Verify deno.json configuration"
-            ;;
-        "rails")
-            echo -e "\n${BLUE}🔧 Rails-specific recommendations:${NC}"
-            echo "   • Run: bundle install"
-            echo "   • Set up database: rails db:setup"
-            ;;
-    esac
-    
-    echo -e "\n${GREEN}✅ Project setup completed successfully!${NC}"
-    echo "   Framework: $framework"
-    echo "   Ready for development with Claude Code"
-}
-
-# Main execution
-case "$ACTION" in
-    "global")
-        setup_global
-        ;;
-    "project")
-        setup_project "$FRAMEWORK"
-        ;;
-    *)
-        echo -e "${RED}❌ Error: Unknown action '$ACTION'${NC}"
-        echo ""
-        echo "Usage:"
-        echo "  $0          - Setup global configuration"
-        echo "  $0 project [framework] - Setup project-specific configuration"
-        exit 1
-        ;;
-esac
+# Main execution - Global setup only
+setup_global

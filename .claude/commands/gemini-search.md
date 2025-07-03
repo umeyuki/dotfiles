@@ -1,0 +1,1 @@
+/home/umeyuki/dotfiles/common/commands/gemini-search.md

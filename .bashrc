@@ -39,8 +39,7 @@ alias open='explorer.exe'
 alias setup='sudo sysctl -w vm.max_map_count=262144; sudo ntpdate 1.ro.pool.ntp.org;'
 
 # Claude Code dotfiles aliases
-alias claude-setup='~/dotfiles/setup.sh'
-alias claude-init='~/dotfiles/setup.sh project'
+alias claude-blueprint='~/dotfiles/claude-blueprint.sh'
 
 # peco + Git連携
 alias pco='git checkout $(git branch | peco)'
@@ -110,6 +109,16 @@ function check_and_suggest_install() {
   if ! command -v peco >/dev/null 2>&1; then
     echo -e "Optional tool: \033[1mpeco\033[0m"
     echo "→ Install: go install github.com/peco/peco/cmd/peco@latest"
+  fi
+
+  if ! command -v similarity-ts >/dev/null 2>&1; then
+    echo -e "Optional tool: \033[1msimilarity-ts (重複コード検出)\033[0m"
+    if ! command -v cargo >/dev/null 2>&1; then
+      echo "→ Install Rust first: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+      echo "→ Then restart shell and run: cargo install similarity-ts"
+    else
+      echo "→ Install: cargo install similarity-ts"
+    fi
   fi
 
 
