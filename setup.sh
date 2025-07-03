@@ -60,6 +60,14 @@ check_tools() {
     
     local tools_ok=true
     
+    # Check Deno
+    if command -v deno >/dev/null 2>&1; then
+        echo -e "   ${GREEN}✓${NC} deno"
+    else
+        echo -e "   ${RED}✗${NC} deno - Install with: curl -fsSL https://deno.land/install.sh | sh"
+        tools_ok=false
+    fi
+    
     # Check jq
     if command -v jq >/dev/null 2>&1; then
         echo -e "   ${GREEN}✓${NC} jq"
