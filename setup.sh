@@ -54,143 +54,12 @@ create_symlink() {
     echo -e "${GREEN}✅ Linked: $target → $source${NC}"
 }
 
-# Function to check required tools
-check_tools() {
-    echo -e "\n${BLUE}🔧 Checking development tools...${NC}"
-    
-    local tools_ok=true
-    local missing_tools=()
-    
-    # Check asdf
-    if command -v asdf >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} asdf"
-    else
-        echo -e "   ${RED}✗${NC} asdf"
-        missing_tools+=("asdf")
-        tools_ok=false
-    fi
-    
-    # Check Deno
-    if command -v deno >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} deno"
-    else
-        echo -e "   ${RED}✗${NC} deno"
-        missing_tools+=("deno")
-        tools_ok=false
-    fi
-    
-    # Check bun
-    if command -v bun >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} bun"
-    else
-        echo -e "   ${RED}✗${NC} bun"
-        missing_tools+=("bun")
-        tools_ok=false
-    fi
-    
-    # Check jq (system package)
-    if command -v jq >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} jq"
-    else
-        echo -e "   ${RED}✗${NC} jq"
-        missing_tools+=("jq")
-        tools_ok=false
-    fi
-    
-    # Check pcheck (requires deno)
-    if command -v pcheck >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} pcheck"
-    else
-        echo -e "   ${RED}✗${NC} pcheck"
-        missing_tools+=("pcheck")
-        tools_ok=false
-    fi
-    
-    # Check optional tools
-    if command -v gemini >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} gemini CLI"
-    else
-        echo -e "   ${YELLOW}⚠${NC}  gemini CLI (optional)"
-    fi
-    
-    if command -v peco >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} peco"
-    else
-        echo -e "   ${YELLOW}⚠${NC}  peco (optional)"
-    fi
-    
-    if [ "$tools_ok" = false ]; then
-        echo -e "\n${YELLOW}Some required tools are missing. Here are the installation commands:${NC}"
-        show_install_commands "${missing_tools[@]}"
-        
-        read -p "Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
-    fi
-}
-
-# Function to show installation commands
-show_install_commands() {
-    local missing_tools=("$@")
-    
-    echo -e "\n${BLUE}📋 Installation Commands:${NC}"
-    echo "=========================================="
-    
-    for tool in "${missing_tools[@]}"; do
-        case "$tool" in
-            "asdf")
-                echo -e "\n${YELLOW}📦 asdf (version manager)${NC}"
-                echo "git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0"
-                echo "echo '. ~/.asdf/asdf.sh' >> ~/.bashrc"
-                echo "echo '. ~/.asdf/completions/asdf.bash' >> ~/.bashrc"
-                echo "source ~/.bashrc"
-                ;;
-            "deno")
-                echo -e "\n${YELLOW}📦 Deno (JavaScript/TypeScript runtime)${NC}"
-                echo "curl -fsSL https://deno.land/install.sh | sh"
-                echo "echo 'export PATH=\"\$HOME/.deno/bin:\$PATH\"' >> ~/.bashrc"
-                echo "source ~/.bashrc"
-                ;;
-            "bun")
-                echo -e "\n${YELLOW}📦 Bun (JavaScript runtime)${NC}"
-                echo "curl -fsSL https://bun.sh/install | bash"
-                echo "source ~/.bashrc"
-                ;;
-            "jq")
-                echo -e "\n${YELLOW}📦 jq (JSON processor)${NC}"
-                echo "sudo apt update && sudo apt install -y jq"
-                ;;
-            "pcheck")
-                echo -e "\n${YELLOW}📦 pcheck (project checklist tool)${NC}"
-                echo "# Requires Deno to be installed first"
-                echo "deno install -Afg --name pcheck jsr:@mizchi/project-checklist/cli"
-                ;;
-        esac
-    done
-    
-    echo -e "\n${BLUE}💡 Optional tools:${NC}"
-    echo "# gemini CLI (Google Gemini API)"
-    echo "npm install -g @google/gemini-cli"
-    echo ""
-    echo "# peco (interactive filtering tool)"
-    echo "go install github.com/peco/peco/cmd/peco@latest"
-    echo ""
-    echo "# win32yank (WSL clipboard utility)"
-    echo "curl -sLo /tmp/win32yank.zip https://github.com/equalsraf/win32yank/releases/latest/download/win32yank-x64.zip"
-    echo "unzip -p /tmp/win32yank.zip win32yank.exe > /tmp/win32yank.exe"
-    echo "chmod +x /tmp/win32yank.exe"
-    echo "sudo mv /tmp/win32yank.exe /usr/local/bin/"
-}
 
 # Global setup function
 setup_global() {
     echo -e "${BLUE}🚀 Claude Code Dotfiles - Global Setup${NC}"
     echo "======================================="
     
-    # Check tools
-    check_tools
     
     echo -e "\n${BLUE}📁 Setting up dotfiles...${NC}"
     
@@ -199,6 +68,18 @@ setup_global() {
     
     # Setup .claude directory
     create_symlink "$SCRIPT_DIR/.claude" "$HOME/.claude"
+    
+    # Setup common commands
+    echo -e "\n${BLUE}🔧 Setting up common commands...${NC}"
+    mkdir -p "$HOME/.claude/commands"
+    
+    # Link common command files
+    for cmd_file in "$SCRIPT_DIR/common/commands"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file")
+            create_symlink "$cmd_file" "$HOME/.claude/commands/$cmd_name"
+        fi
+    done
     
     # Setup scripts
     if [ ! -d "$HOME/scripts" ]; then
