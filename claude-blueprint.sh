@@ -46,31 +46,19 @@ echo -e "${BLUE}📝 Setting up project CLAUDE.md...${NC}"
 cat > "CLAUDE.md" << EOF
 # Claude Code Configuration for $TEMPLATE Project
 
-#include $SCRIPT_DIR/.claude/CLAUDE.md
+#include $SCRIPT_DIR/common/CLAUDE.md
 #include $SCRIPT_DIR/templates/$TEMPLATE/CLAUDE.md
 
-## Project-Specific Configuration
+## Project Documentation
 
-<!-- TODO: プロジェクト情報を記入してください -->
-**Project Name**: <!-- TODO: プロジェクト名を記入 -->
-**Description**: <!-- TODO: プロジェクトの説明を記入 -->
-**Template**: $TEMPLATE
+For detailed project information, refer to the following documents in the \`docs/\` directory:
 
-### Project Context
+- **docs/SPECIFICATION.md**: Technical specifications, requirements, and architecture details
+- **docs/IMPROVEMENT_HISTORY.md**: Learning records, decisions made, and improvements implemented  
+- **docs/HISTORICAL_CONTEXT.md**: Project evolution, decision history, and contextual background
+- **docs/TROUBLESHOOTING.md**: Common errors, solutions, and debugging approaches
 
-<!-- TODO: 以下の項目を記入してください -->
-**Purpose**: <!-- TODO: プロジェクトの目的を記述 -->
-**Key Features**: 
-- <!-- TODO: 主要機能1 -->
-- <!-- TODO: 主要機能2 -->
-- <!-- TODO: 主要機能3 -->
-
-### Quick Start
-
-<!-- TODO: プロジェクト固有のセットアップ手順を記入 -->
-1. <!-- TODO: セットアップ手順1 -->
-2. <!-- TODO: セットアップ手順2 -->
-3. <!-- TODO: セットアップ手順3 -->
+Use these documents to understand project context, track changes, and resolve issues effectively.
 EOF
 echo -e "${GREEN}✅ Created: CLAUDE.md${NC}"
 
