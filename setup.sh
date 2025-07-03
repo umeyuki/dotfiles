@@ -88,15 +88,6 @@ check_tools() {
         tools_ok=false
     fi
     
-    # Check rbenv
-    if command -v rbenv >/dev/null 2>&1; then
-        echo -e "   ${GREEN}✓${NC} rbenv"
-    else
-        echo -e "   ${RED}✗${NC} rbenv"
-        missing_tools+=("rbenv")
-        tools_ok=false
-    fi
-    
     # Check jq (system package)
     if command -v jq >/dev/null 2>&1; then
         echo -e "   ${GREEN}✓${NC} jq"
@@ -166,14 +157,6 @@ show_install_commands() {
                 echo -e "\n${YELLOW}📦 Bun (JavaScript runtime)${NC}"
                 echo "curl -fsSL https://bun.sh/install | bash"
                 echo "source ~/.bashrc"
-                ;;
-            "rbenv")
-                echo -e "\n${YELLOW}📦 rbenv (Ruby version manager)${NC}"
-                echo "git clone https://github.com/rbenv/rbenv.git ~/.rbenv"
-                echo "echo 'export PATH=\"\$HOME/.rbenv/bin:\$PATH\"' >> ~/.bashrc"
-                echo "echo 'eval \"\$(rbenv init -)\"' >> ~/.bashrc"
-                echo "source ~/.bashrc"
-                echo "git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build"
                 ;;
             "jq")
                 echo -e "\n${YELLOW}📦 jq (JSON processor)${NC}"
