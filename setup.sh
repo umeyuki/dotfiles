@@ -51,6 +51,20 @@ copy_file() {
     echo -e "${GREEN}✅ Copied: $source → $target${NC}"
 }
 
+# Function to create symbolic link (replaced with copy for Claude Code compatibility)
+create_symlink() {
+    local source="$1"
+    local target="$2"
+    
+    # Use copy instead of symlink for Claude Code compatibility
+    copy_file "$source" "$target"
+}
+
+# Alias for clarity - Claude Code doesn't support symlinks
+copy_for_claude() {
+    copy_file "$1" "$2"
+}
+
 
 # Global setup function
 setup_global() {
@@ -60,8 +74,13 @@ setup_global() {
     
     echo -e "\n${BLUE}📁 Setting up dotfiles...${NC}"
     
-    # Setup .bashrc
-    create_symlink "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
+    # Setup .bashrc (using actual symlink for shell config)
+    if [ -e "$HOME/.bashrc" ] || [ -L "$HOME/.bashrc" ]; then
+        backup_file "$HOME/.bashrc"
+        rm -f "$HOME/.bashrc"
+    fi
+    ln -s "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
+    echo -e "${GREEN}✅ Symlinked: .bashrc${NC}"
     
     # Setup .claude directory structure (not full directory link)
     echo -e "\n${BLUE}🔧 Setting up Claude configuration...${NC}"
@@ -87,7 +106,7 @@ setup_global() {
     for hook_file in "$SCRIPT_DIR/common/hooks"/*; do
         if [ -f "$hook_file" ]; then
             hook_name=$(basename "$hook_file")
-            create_symlink "$hook_file" "$HOME/.claude/hooks/$hook_name"
+            copy_for_claude "$hook_file" "$HOME/.claude/hooks/$hook_name"
         fi
     done
     
