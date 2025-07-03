@@ -63,14 +63,18 @@ setup_global() {
     # Setup .bashrc
     create_symlink "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
     
-    # Setup .claude directory
-    create_symlink "$SCRIPT_DIR/.claude" "$HOME/.claude"
+    # Setup .claude directory structure (not full directory link)
+    echo -e "\n${BLUE}🔧 Setting up Claude configuration...${NC}"
+    mkdir -p "$HOME/.claude"
+    
+    # Link CLAUDE.md
+    create_symlink "$SCRIPT_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+    
+    # Link settings.json (hooks configuration)
+    create_symlink "$SCRIPT_DIR/.claude/settings.json" "$HOME/.claude/settings.json"
     
     # Setup common commands
-    echo -e "\n${BLUE}🔧 Setting up common commands...${NC}"
     mkdir -p "$HOME/.claude/commands"
-    
-    # Link common command files
     for cmd_file in "$SCRIPT_DIR/common/commands"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
@@ -79,10 +83,7 @@ setup_global() {
     done
     
     # Setup common hooks
-    echo -e "\n${BLUE}🪝 Setting up common hooks...${NC}"
     mkdir -p "$HOME/.claude/hooks"
-    
-    # Link common hook files
     for hook_file in "$SCRIPT_DIR/common/hooks"/*; do
         if [ -f "$hook_file" ]; then
             hook_name=$(basename "$hook_file")
@@ -106,15 +107,16 @@ EOF
     
     # Setup Claude Code Hooks
     echo -e "\n${BLUE}🎯 Next Steps:${NC}"
-    echo "1. Configure Claude Code Hooks for notifications:"
-    echo "   • Run: /hooks in Claude Code"
-    echo "   • Select: 3. Notification - When notifications are sent"
-    echo "   • Add hook command:"
-    echo -e "${YELLOW}     jq -r '.message' | xargs ~/.claude/hooks/notify-pushover.sh \"Claude\"${NC}"
+    echo "1. Edit ~/.env.local with your Pushover API keys"
     echo ""
-    echo "2. Edit ~/.env.local with your Pushover API keys"
+    echo "2. Install similarity-ts for duplicate detection:"
+    echo "   • cargo install similarity-ts (requires Rust)"
     echo ""
     echo "3. Reload your shell: source ~/.bashrc"
+    echo ""
+    echo -e "${GREEN}✅ Hooks automatically configured:${NC}"
+    echo "   • Notification Hook: Pushover通知"
+    echo "   • Code Quality Hook: 重複コード検出"
     echo ""
     echo -e "${GREEN}✅ Global setup completed successfully!${NC}"
 }

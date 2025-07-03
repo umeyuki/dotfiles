@@ -12,16 +12,19 @@
 dotfiles/
 ├── .bashrc                 # Bash設定
 ├── .claude/               # Claude Code設定
-│   └── CLAUDE.md          # グローバルClaude設定
+│   ├── CLAUDE.md          # グローバルClaude設定
+│   └── settings.json      # Hooks設定（自動化）
 ├── .gitignore             # Git除外設定
-├── setup.sh               # セットアップスクリプト
-├── scripts/               # ユーティリティスクリプト
-│   └── notify-pushover.sh # Pushover通知
+├── setup.sh               # グローバルセットアップスクリプト
+├── claude-blueprint.sh    # プロジェクトテンプレートスクリプト
 ├── common/                # 共通テンプレート
 │   ├── commands/          # コマンドテンプレート
-│   └── docs/              # ドキュメントテンプレート
-└── frameworks/            # フレームワーク別設定
-    ├── hono/              # Hono設定
+│   ├── docs/              # ドキュメントテンプレート
+│   └── hooks/             # 共通Hooksスクリプト
+│       ├── detect-duplicates.sh # 重複コード検出
+│       └── notify-pushover.sh   # Pushover通知
+└── templates/             # プロジェクトテンプレート
+    ├── hono-sveltekit/    # Hono+SvelteKit設定
     └── rails/             # Rails設定
 ```
 
@@ -36,37 +39,39 @@ git clone https://github.com/umeyuki/dotfiles.git ~/dotfiles
 # グローバル設定をインストール
 ~/dotfiles/setup.sh
 
-# または
-claude-setup  # エイリアスを使用
+# シェルを再読み込み
+source ~/.bashrc
 ```
 
-### 2. プロジェクト設定
+### 2. プロジェクトテンプレート作成
 
 ```bash
 # プロジェクトディレクトリで実行
-claude-init <framework>
+claude-blueprint                    # hono-sveltekit（デフォルト）
+claude-blueprint hono-sveltekit    # 明示的指定
+claude-blueprint rails             # Rails用
 
-# 例：Honoプロジェクト
-claude-init hono
-
-# 例：Railsプロジェクト
-claude-init rails
+# 例：新しいプロジェクト作成
+mkdir my-app && cd my-app
+claude-blueprint
 ```
 
 ## 主な機能
 
+### 自動化されたHooks
+- **重複コード検出**: similarity-ts による自動チェック（ファイル編集時）
+- **Pushover通知**: Claude Codeからの自動通知
+- **設定不要**: setup.sh 実行時に自動で有効化
+
 ### 開発環境チェック
-- asdf, deno, bun, jq, pcheckなどの必要ツールの確認
+- asdf, deno, bun, jq, pcheck, similarity-ts などの必要ツールの確認
 - 未インストールツールの公式インストール手順を表示
 
-### 通知機能
-- Pushover経由でのタスク完了通知
-- Claude Codeからの自動通知
-
-### テンプレート
-- フレームワーク別のClaude設定
+### プロジェクトテンプレート
+- **hono-sveltekit**: Hono + SvelteKit + Turso + Cloud Run/Cloudflare構成
+- **rails**: Ruby on Rails構成
 - プロジェクト構成用ドキュメントテンプレート
-- タスク管理用TODO.md
+- タスク管理用TODO.md（pcheck対応）
 
 ## 必要なツール
 
@@ -77,22 +82,23 @@ claude-init rails
 - **jq**: JSON処理
 - **pcheck**: タスク管理ツール
 
-### オプション
-- **gemini CLI**: Google Gemini API
+### オプション（推奨）
+- **similarity-ts**: 重複コード検出（cargo install similarity-ts）
+- **gemini CLI**: Google Gemini API（npm install -g @google/gemini-cli）
 - **peco**: インタラクティブフィルタ
-- **win32yank**: WSLクリップボード連携
 
 ## 使用方法
 
-### エイリアス
+### 基本コマンド
 ```bash
-claude-setup    # グローバル設定インストール
-claude-init     # プロジェクト設定初期化
+~/dotfiles/setup.sh              # 初回グローバルセットアップ
+claude-blueprint                 # プロジェクトテンプレート作成
 ```
 
-### 通知設定
-1. `~/.env.local`にPushover APIキーを設定
-2. Claude Code Hooksで通知を有効化
+### 設定ファイル
+- **~/.env.local**: Pushover APIキー設定
+- **~/.claude/settings.json**: Hooks設定（自動）
+- **~/.claude/CLAUDE.md**: Claude設定（自動）
 
 ## 注意事項
 

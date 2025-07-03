@@ -1,0 +1,1 @@
+/home/umeyuki/dotfiles/common/hooks/notify-pushover.sh
