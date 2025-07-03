@@ -126,5 +126,5 @@ function check_and_suggest_install() {
     echo "All essential tools are installed ✅"
   fi
 }
-
+export BROWSER="/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 check_and_suggest_install
