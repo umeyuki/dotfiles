@@ -32,8 +32,8 @@ backup_file() {
     fi
 }
 
-# Function to create symlink with backup
-create_symlink() {
+# Function to copy file with backup
+copy_file() {
     local source="$1"
     local target="$2"
     
@@ -46,9 +46,9 @@ create_symlink() {
     # Create parent directory if needed
     mkdir -p "$(dirname "$target")"
     
-    # Create symlink
-    ln -s "$source" "$target"
-    echo -e "${GREEN}✅ Linked: $target → $source${NC}"
+    # Copy file
+    cp "$source" "$target"
+    echo -e "${GREEN}✅ Copied: $source → $target${NC}"
 }
 
 
@@ -67,18 +67,18 @@ setup_global() {
     echo -e "\n${BLUE}🔧 Setting up Claude configuration...${NC}"
     mkdir -p "$HOME/.claude"
     
-    # Link CLAUDE.md from common directory
-    create_symlink "$SCRIPT_DIR/common/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+    # Copy CLAUDE.md from common directory (Claude Code doesn't support symlinks)
+    copy_file "$SCRIPT_DIR/common/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
     
-    # Link settings.json (hooks configuration) from common directory
-    create_symlink "$SCRIPT_DIR/common/settings.json" "$HOME/.claude/settings.json"
+    # Copy settings.json (hooks configuration) from common directory
+    copy_file "$SCRIPT_DIR/common/settings.json" "$HOME/.claude/settings.json"
     
-    # Setup common commands
+    # Setup common commands (Claude Code doesn't support symlinks)
     mkdir -p "$HOME/.claude/commands"
     for cmd_file in "$SCRIPT_DIR/common/commands"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
-            create_symlink "$cmd_file" "$HOME/.claude/commands/$cmd_name"
+            copy_file "$cmd_file" "$HOME/.claude/commands/$cmd_name"
         fi
     done
     
