@@ -1,0 +1,29 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backup directories
+tmp/
+*backup*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Local settings that shouldn't be shared
+settings.local.json
+
+# Temporary files
+*.tmp
+*.temp
