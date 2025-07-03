@@ -67,11 +67,11 @@ setup_global() {
     echo -e "\n${BLUE}🔧 Setting up Claude configuration...${NC}"
     mkdir -p "$HOME/.claude"
     
-    # Link CLAUDE.md
-    create_symlink "$SCRIPT_DIR/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+    # Link CLAUDE.md from common directory
+    create_symlink "$SCRIPT_DIR/common/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
     
-    # Link settings.json (hooks configuration)
-    create_symlink "$SCRIPT_DIR/.claude/settings.json" "$HOME/.claude/settings.json"
+    # Link settings.json (hooks configuration) from common directory
+    create_symlink "$SCRIPT_DIR/common/settings.json" "$HOME/.claude/settings.json"
     
     # Setup common commands
     mkdir -p "$HOME/.claude/commands"
@@ -117,6 +117,7 @@ EOF
     echo -e "${GREEN}✅ Hooks automatically configured:${NC}"
     echo "   • Notification Hook: Pushover通知"
     echo "   • Code Quality Hook: 重複コード検出"
+    echo "   • Testing Hook: ファイル編集後テスト自動実行（TDD支援）"
     echo ""
     echo -e "${GREEN}✅ Global setup completed successfully!${NC}"
 }

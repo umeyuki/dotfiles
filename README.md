@@ -61,6 +61,7 @@ claude-blueprint
 ### 自動化されたHooks
 - **重複コード検出**: similarity-ts による自動チェック（ファイル編集時）
 - **Pushover通知**: Claude Codeからの自動通知
+- **テスト自動実行**: TDD支援のためファイル編集後にテスト自動実行
 - **設定不要**: setup.sh 実行時に自動で有効化
 
 ### 開発環境チェック

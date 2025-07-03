@@ -1,1 +1,1 @@
-/home/umeyuki/dotfiles/.claude/CLAUDE.md
+/home/umeyuki/dotfiles/common/CLAUDE.md

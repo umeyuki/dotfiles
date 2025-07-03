@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.message' | xargs ~/.claude/hooks/notify-pushover.sh \"Claude\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/detect-duplicates.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/run-tests.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

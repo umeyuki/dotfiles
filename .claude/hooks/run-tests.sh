@@ -1,0 +1,1 @@
+/home/umeyuki/dotfiles/common/hooks/run-tests.sh
