@@ -119,9 +119,27 @@ setup_global() {
 # Get your keys from https://pushover.net/
 PUSHOVER_USER_KEY=your-user-key-here
 PUSHOVER_APP_TOKEN=your-app-token-here
+
+# TDD Hook notification settings
+# ENABLE_TDD_NOTIFICATIONS=true  # 通知を有効化
+# NOTIFY_ON_SUCCESS=false        # テスト成功時の通知（デフォルト: false）
+# NOTIFY_ON_FAILURE=true         # テスト失敗時の通知（デフォルト: true）
 EOF
         echo -e "${GREEN}✅ Created: ~/.env.local${NC}"
         echo -e "${YELLOW}   Please edit this file and add your Pushover API keys${NC}"
+    else
+        # 既存の.env.localにTDD設定が無い場合は追加
+        if ! grep -q "ENABLE_TDD_NOTIFICATIONS" "$HOME/.env.local"; then
+            echo -e "\n${BLUE}📝 Adding TDD notification settings to .env.local...${NC}"
+            cat >> "$HOME/.env.local" << 'EOF'
+
+# TDD Hook notification settings
+# ENABLE_TDD_NOTIFICATIONS=true  # 通知を有効化
+# NOTIFY_ON_SUCCESS=false        # テスト成功時の通知（デフォルト: false）
+# NOTIFY_ON_FAILURE=true         # テスト失敗時の通知（デフォルト: true）
+EOF
+            echo -e "${GREEN}✅ Updated: ~/.env.local${NC}"
+        fi
     fi
     
     # Setup Claude Code Hooks
@@ -137,6 +155,8 @@ EOF
     echo "   • Notification Hook: Pushover通知"
     echo "   • Code Quality Hook: 重複コード検出"
     echo "   • Testing Hook: ファイル編集後テスト自動実行（TDD支援）"
+    echo "     - テストが失敗すると自動的にフィードバック"
+    echo "     - Red-Green-Refactorサイクルを自動化"
     echo ""
     echo -e "${GREEN}✅ Global setup completed successfully!${NC}"
 }
