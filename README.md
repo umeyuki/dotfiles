@@ -68,6 +68,9 @@ claude-blueprint
 ### 自動化されたHooks
 - **重複コード検出**: similarity-ts による自動チェック（ファイル編集時）
 - **Pushover通知**: Claude Codeからの自動通知（Ubuntu対応）
+  - 無意味な通知をフィルタリング（「Claude: Claude」等）
+  - 5秒以内の重複通知を自動スキップ
+  - デバッグログ: ~/.claude/pushover-debug.log
 - **TDD自動テスト実行**: ファイル編集後に自動でテスト実行
   - デバッグログ機能（~/.claude/tdd-debug.log）
   - スマート通知制御（失敗時のみ通知を推奨）

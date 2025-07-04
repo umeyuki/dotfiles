@@ -19,26 +19,7 @@ if [ -f "$HOME/.env.local" ]; then
     export $(grep -v '^#' "$HOME/.env.local" | xargs)
 fi
 
-# 通知設定（環境変数で制御）
-ENABLE_TDD_NOTIFICATIONS="${ENABLE_TDD_NOTIFICATIONS:-false}"
-NOTIFY_ON_SUCCESS="${NOTIFY_ON_SUCCESS:-false}"
-NOTIFY_ON_FAILURE="${NOTIFY_ON_FAILURE:-true}"
-
-# Pushover通知関数
-notify_pushover() {
-    local title="$1"
-    local message="$2"
-    
-    # 通知が無効な場合はスキップ
-    if [ "$ENABLE_TDD_NOTIFICATIONS" != "true" ]; then
-        return
-    fi
-    
-    # notify-pushover.shを使用
-    if [ -x "$HOME/.claude/hooks/notify-pushover.sh" ]; then
-        echo "$message" | "$HOME/.claude/hooks/notify-pushover.sh" "$title"
-    fi
-}
+# 通知機能はNotificationフックに委譲（重複を避けるため削除）
 
 # 連続実行制御用のロックファイル
 LOCK_DIR="$HOME/.claude/hooks/locks"
@@ -61,7 +42,7 @@ case "$tool_name" in
 esac
 
 # 編集されたファイルパスを取得
-file_path=$(echo "$input_data" | jq -r '.file_path // ""')
+file_path=$(echo "$input_data" | jq -r '.tool_input.file_path // .file_path // ""')
 
 log_debug "File edited: $file_path"
 
@@ -90,7 +71,13 @@ fi
 date +%s > "$LOCK_FILE"
 
 # プロジェクトルートを検索（package.json、Gemfile、deno.json が存在する場所）
-PROJECT_ROOT=$(pwd)
+# 編集されたファイルのディレクトリから開始
+if [ -n "$file_path" ]; then
+  PROJECT_ROOT=$(dirname "$file_path")
+else
+  PROJECT_ROOT=$(pwd)
+fi
+
 while [ "$PROJECT_ROOT" != "/" ]; do
   if [ -f "$PROJECT_ROOT/package.json" ] || [ -f "$PROJECT_ROOT/Gemfile" ] || [ -f "$PROJECT_ROOT/deno.json" ] || [ -f "$PROJECT_ROOT/pyproject.toml" ] || [ -f "$PROJECT_ROOT/requirements.txt" ]; then
     break
@@ -185,9 +172,9 @@ if [ $test_result -ne 0 ]; then
   fi
   echo "" >&2
   
-  # Pushover通知（失敗時）
-  if [ "$NOTIFY_ON_FAILURE" = "true" ]; then
-    notify_pushover "TDD: テスト失敗 ❌" "テストが失敗しました: $(basename $file_path)"
+  # テスト失敗の通知を送信
+  if [ -n "$PUSHOVER_USER_KEY" ] && [ -n "$PUSHOVER_APP_TOKEN" ]; then
+    ~/.claude/hooks/notify-pushover.sh "TDD: テスト失敗" "❌ ${test_command} が失敗しました。Redフェーズ - 実装を修正してください。"
   fi
   
   # TDDフェーズを更新
@@ -216,9 +203,15 @@ else
   fi
   echo "" >&2
   
-  # Pushover通知（成功時）
-  if [ "$NOTIFY_ON_SUCCESS" = "true" ]; then
-    notify_pushover "TDD: テスト成功 ✅" "すべてのテストが成功しました: $(basename $file_path)"
+  # テスト成功の通知を送信
+  if [ -n "$PUSHOVER_USER_KEY" ] && [ -n "$PUSHOVER_APP_TOKEN" ]; then
+    if [ "$TDD_PHASE" = "Green" ]; then
+      ~/.claude/hooks/notify-pushover.sh "TDD: テスト成功" "✅ ${test_command} が成功しました。Greenフェーズ - リファクタリングを検討してください。"
+    elif [ "$TDD_PHASE" = "Refactor" ]; then
+      ~/.claude/hooks/notify-pushover.sh "TDD: リファクタリング完了" "✅ リファクタリング後もテストが通っています。次の機能に進みましょう。"
+    else
+      ~/.claude/hooks/notify-pushover.sh "TDD: テスト成功" "✅ ${test_command} が成功しました。"
+    fi
   fi
 fi
 
