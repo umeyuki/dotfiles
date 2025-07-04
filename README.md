@@ -17,15 +17,22 @@ dotfiles/
 ├── .gitignore             # Git除外設定
 ├── setup.sh               # グローバルセットアップスクリプト
 ├── claude-blueprint.sh    # プロジェクトテンプレートスクリプト
+├── TROUBLESHOOTING.md     # TDD環境トラブルシューティング
 ├── common/                # 共通テンプレート
 │   ├── commands/          # コマンドテンプレート
 │   ├── docs/              # ドキュメントテンプレート
 │   └── hooks/             # 共通Hooksスクリプト
 │       ├── detect-duplicates.sh # 重複コード検出
-│       └── notify-pushover.sh   # Pushover通知
-└── templates/             # プロジェクトテンプレート
-    ├── hono-sveltekit/    # Hono+SvelteKit設定
-    └── rails/             # Rails設定
+│       ├── notify-pushover.sh   # Pushover通知
+│       └── run-tests.sh         # TDD自動テスト実行
+├── templates/             # プロジェクトテンプレート
+│   ├── hono-sveltekit/    # Hono+SvelteKit設定
+│   └── rails/             # Rails設定
+└── test-claude-tdd/       # TDD動作確認用サンプル
+    ├── test-hook.sh       # Hook動作確認スクリプト
+    ├── python/            # Pythonサンプル
+    ├── go/                # Goサンプル
+    └── *.js               # JavaScriptサンプル
 ```
 
 ## セットアップ
@@ -60,8 +67,12 @@ claude-blueprint
 
 ### 自動化されたHooks
 - **重複コード検出**: similarity-ts による自動チェック（ファイル編集時）
-- **Pushover通知**: Claude Codeからの自動通知
-- **テスト自動実行**: TDD支援のためファイル編集後にテスト自動実行
+- **Pushover通知**: Claude Codeからの自動通知（Ubuntu対応）
+- **TDD自動テスト実行**: ファイル編集後に自動でテスト実行
+  - デバッグログ機能（~/.claude/tdd-debug.log）
+  - スマート通知制御（失敗時のみ通知を推奨）
+  - 連続実行防止（5秒間のデバウンス）
+  - TDDフェーズ管理（Red-Green-Refactorサイクル）
 - **設定不要**: setup.sh 実行時に自動で有効化
 
 ### 開発環境チェック
@@ -99,9 +110,20 @@ claude-blueprint                 # プロジェクトテンプレート作成
 ```
 
 ### 設定ファイル
-- **~/.env.local**: Pushover APIキー設定
+- **~/.env.local**: Pushover APIキーとTDD通知設定
+  ```bash
+  # Pushover設定
+  PUSHOVER_USER_KEY=your-user-key
+  PUSHOVER_APP_TOKEN=your-app-token
+  
+  # TDD通知設定（推奨設定）
+  ENABLE_TDD_NOTIFICATIONS=true  # 通知を有効化
+  NOTIFY_ON_SUCCESS=false        # 成功時は通知しない
+  NOTIFY_ON_FAILURE=true         # 失敗時のみ通知
+  ```
 - **~/.claude/settings.json**: Hooks設定（自動）
 - **~/.claude/CLAUDE.md**: Claude設定（自動）
+- **~/.claude/tdd-debug.log**: TDDフックのデバッグログ
 
 ## 注意事項
 

@@ -152,11 +152,12 @@ EOF
     echo "3. Reload your shell: source ~/.bashrc"
     echo ""
     echo -e "${GREEN}✅ Hooks automatically configured:${NC}"
-    echo "   • Notification Hook: Pushover通知"
+    echo "   • Notification Hook: Pushover通知（Ubuntu対応）"
     echo "   • Code Quality Hook: 重複コード検出"
     echo "   • Testing Hook: ファイル編集後テスト自動実行（TDD支援）"
     echo "     - テストが失敗すると自動的にフィードバック"
     echo "     - Red-Green-Refactorサイクルを自動化"
+    echo "     - デバッグログ: ~/.claude/tdd-debug.log"
     echo ""
     echo -e "${GREEN}✅ Global setup completed successfully!${NC}"
 }
