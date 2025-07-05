@@ -1,5 +1,4 @@
- # ~/.bashrc - minimal, asdf-based, Claude Code friendly
-
+# ~/.bashrc - minimal, asdf-based, Claude Code friendly
 # 対話シェルでなければ抜ける
 case $- in *i*) ;; *) return ;; esac
 
@@ -18,14 +17,10 @@ export GOPATH="$HOME/dev"
 export BUN_INSTALL="$HOME/.bun"
 export ASDF_DATA_DIR="$HOME/.asdf"
 
-export PATH="$HOME/.asdf/shims:$HOME/.asdf/bin:$BUN_INSTALL/bin:$GOPATH/bin/flutter/bin:/usr/local/go/bin:$PATH"
+export PATH="$HOME/dev/bin:$ASDF_DATA_DIR/shims:$BUN_INSTALL/bin:$GOPATH/bin:$PATH"
+export PATH="$PATH:/usr/local/go/bin"
 
-# asdf初期化（Node.js, Ruby, etc 管理統一）
-if [ -f "$HOME/.asdf/asdf.sh" ]; then
-  . "$HOME/.asdf/asdf.sh"
-  . "$HOME/.asdf/completions/asdf.bash"
-fi
-
+# Deno
 [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
 # ───── プロンプト（軽量版）─────
@@ -60,20 +55,29 @@ if ! shopt -oq posix; then
   [ -f /etc/bash_completion ] && . /etc/bash_completion
 fi
 
+# asdf補完設定（asdfコマンドが存在する場合のみ）
+if command -v asdf &> /dev/null; then
+  . <(asdf completion bash)
+fi
+
 # ~/.bash_aliases があれば読み込み
 [ -f ~/.bash_aliases ] && . ~/.bash_aliases
 
+# ブラウザ設定
+export BROWSER="/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 
+# セットアップチェック機能
 function check_and_suggest_install() {
   local missing=0
-
   echo -e "\n\033[1;33m[Setup Notice]\033[0m"
 
   # check required tools
   if ! command -v asdf >/dev/null 2>&1; then
     echo -e "Missing tool: \033[1masdf\033[0m"
-    echo "→ Install: git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0"
+    echo "→ Install: go install github.com/asdf-vm/asdf/cmd/asdf@latest && cp ~/go/bin/asdf ~/bin/"
     missing=1
+  else
+    echo "asdf: $(asdf --version 2>/dev/null || echo 'installed but version unknown')"
   fi
 
   if ! command -v deno >/dev/null 2>&1; then
@@ -121,10 +125,10 @@ function check_and_suggest_install() {
     fi
   fi
 
-
   if [ "$missing" -eq 0 ]; then
     echo "All essential tools are installed ✅"
   fi
 }
-export BROWSER="/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+
+# 起動時にチェック実行
 check_and_suggest_install
