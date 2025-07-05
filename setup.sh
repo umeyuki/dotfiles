@@ -32,13 +32,38 @@ backup_file() {
     fi
 }
 
+# Function to ask for user confirmation
+ask_confirmation() {
+    local file="$1"
+    local response
+    
+    echo -e "${YELLOW}File already exists: $file${NC}"
+    read -p "Do you want to update it? (yes/no): " response
+    
+    case "$response" in
+        [yY]|[yY][eE][sS])
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 # Function to copy file with backup
 copy_file() {
     local source="$1"
     local target="$2"
+    local force="${3:-false}"
     
-    # Backup existing file/directory if it exists
+    # Check if file exists and ask for confirmation
     if [ -e "$target" ] || [ -L "$target" ]; then
+        if [ "$force" != "true" ]; then
+            if ! ask_confirmation "$target"; then
+                echo -e "${BLUE}Skipped: $target${NC}"
+                return
+            fi
+        fi
         backup_file "$target"
         rm -rf "$target"
     fi
@@ -76,11 +101,18 @@ setup_global() {
     
     # Setup .bashrc (using actual symlink for shell config)
     if [ -e "$HOME/.bashrc" ] || [ -L "$HOME/.bashrc" ]; then
-        backup_file "$HOME/.bashrc"
-        rm -f "$HOME/.bashrc"
+        if ! ask_confirmation "$HOME/.bashrc"; then
+            echo -e "${BLUE}Skipped: .bashrc${NC}"
+        else
+            backup_file "$HOME/.bashrc"
+            rm -f "$HOME/.bashrc"
+            ln -s "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
+            echo -e "${GREEN}✅ Symlinked: .bashrc${NC}"
+        fi
+    else
+        ln -s "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
+        echo -e "${GREEN}✅ Symlinked: .bashrc${NC}"
     fi
-    ln -s "$SCRIPT_DIR/.bashrc" "$HOME/.bashrc"
-    echo -e "${GREEN}✅ Symlinked: .bashrc${NC}"
     
     # Setup .claude directory structure (not full directory link)
     echo -e "\n${BLUE}🔧 Setting up Claude configuration...${NC}"

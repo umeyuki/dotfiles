@@ -32,29 +32,16 @@ if [ -f "$NOTIFICATION_LOCK" ]; then
 fi
 date +%s > "$NOTIFICATION_LOCK"
 
-# より具体的なタイトルを生成
-generate_specific_title() {
-    local original_title="$1"
-    local message="$2"
-    
-    # メッセージの内容に応じてタイトルを調整
-    if [[ "$message" =~ "承認" || "$message" =~ "approval" ]]; then
-        echo "Claude: 承認が必要です"
-    elif [[ "$message" =~ "エラー" || "$message" =~ "error" ]]; then
-        echo "Claude: エラーが発生しました"
-    elif [[ "$message" =~ "完了" || "$message" =~ "complete" ]]; then
-        echo "Claude: 作業が完了しました"
-    elif [[ "$message" =~ "テスト" || "$message" =~ "test" ]]; then
-        echo "Claude: テスト結果"
-    elif [[ "$message" =~ "ファイル編集" || "$message" =~ "edit" ]]; then
-        echo "Claude: ファイル編集検出"
-    else
-        echo "Claude: $original_title"
-    fi
-}
+# Get project name from current directory
+PROJECT_NAME=$(basename "$(pwd)")
 
-# 具体的なタイトルを生成
-SPECIFIC_TITLE=$(generate_specific_title "$TITLE" "$MESSAGE")
+# Truncate project name if too long (max 25 chars)
+if [ ${#PROJECT_NAME} -gt 25 ]; then
+    PROJECT_NAME="${PROJECT_NAME:0:22}..."
+fi
+
+# Use project name as title instead of the passed title
+SPECIFIC_TITLE="$PROJECT_NAME"
 
 # Load environment variables from .env.local if it exists
 if [ -f "$HOME/.env.local" ]; then

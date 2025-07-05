@@ -33,8 +33,16 @@ if [ -f "$NOTIFICATION_LOCK" ]; then
 fi
 date +%s > "$NOTIFICATION_LOCK"
 
-# Use the original title as-is since messages come in English
-SPECIFIC_TITLE="$TITLE"
+# Get project name from current directory
+PROJECT_NAME=$(basename "$(pwd)")
+
+# Truncate project name if too long (max 25 chars)
+if [ ${#PROJECT_NAME} -gt 25 ]; then
+    PROJECT_NAME="${PROJECT_NAME:0:22}..."
+fi
+
+# Use project name as title instead of the passed title
+SPECIFIC_TITLE="$PROJECT_NAME"
 
 # Load environment variables from .env.local if it exists
 if [ -f "$HOME/.env.local" ]; then
