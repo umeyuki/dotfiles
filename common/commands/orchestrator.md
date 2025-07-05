@@ -10,11 +10,12 @@ Split complex tasks into sequential steps, where each step can contain multiple 
 
 ## Process
 
-1. **Initial Analysis**
-   - First, analyze the entire task to understand scope and requirements
+1. **Initial Setup and Task Analysis**
+   - **Automatic pcheck initialization**: First run `pcheck` to check existing TODO items
+   - Analyze the entire task to understand scope and requirements
    - Identify dependencies and execution order
    - Plan sequential steps based on dependencies
-   - Use `pcheck add` to create initial task structure
+   - Use `pcheck add` to create initial task structure for all planned steps
 
 2. **Step Planning**
    - Break down into 2-4 sequential steps
@@ -26,7 +27,7 @@ Split complex tasks into sequential steps, where each step can contain multiple 
    - Wait for all subtasks in current step to complete
    - Pass relevant results to next step
    - Request concise summaries (100-200 words) from each subtask
-   - Use `pcheck check <id>` to mark completed tasks
+   - Use `pcheck check <id>` to mark completed tasks immediately after completion
 
 4. **Step Review and Adaptation**
    - After each step completion, review results
@@ -44,6 +45,10 @@ Split complex tasks into sequential steps, where each step can contain multiple 
 ## Example Usage
 
 When given "analyze test lint and commit":
+
+**Step 0: Task Management Setup**
+- Run `pcheck` to check existing tasks
+- Add all planned steps using `pcheck add`
 
 **Step 1: Initial Analysis** (1 subtask)
 - Analyze project structure to understand test/lint setup
@@ -75,10 +80,16 @@ When given "analyze test lint and commit":
 
 ## Implementation Notes
 
+- **Automatic pcheck integration**: Always start by running `pcheck` to check existing tasks
 - Always start with a single analysis task to understand the full scope
 - Group related parallel tasks within the same step
 - Pass only essential findings between steps (summaries, not full output)
-- Use `pcheck` to track both steps and subtasks for visibility
+- Use `pcheck` to track both steps and subtasks for visibility:
+  - Run `pcheck` at the beginning to see current state
+  - Use `pcheck add -m "task"` for each identified task
+  - Use `pcheck check <id>` immediately after completing each task
+  - Use `pcheck u` to update TODO.md after major milestones
+  - Use `pcheck u --vacuum` before final commit
 - After each step, explicitly reconsider the plan:
   - Are the next steps still relevant?
   - Did we discover something that requires new tasks?
