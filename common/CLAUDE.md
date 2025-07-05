@@ -3,20 +3,7 @@
 ### Project Management
 
 - **Session Start**: Execute `/project:orchestrator` to load context and plan task execution
-
-### Project Checklist Tool (pcheck)
-
-- **Installation**: If pcheck is not installed, run:
-  `deno install -Afg --name pcheck jsr:@mizchi/project-checklist/cli`
-- **Basic Usage**:
-  - `pcheck` - Show all TODO items in the project
-  - `pcheck u` - Update TODO.md by moving completed tasks to COMPLETED section
-  - `pcheck u --vacuum` - Remove completed tasks and output them (for git commits)
-  - `pcheck --code` - Include TODO comments from source code
-- **Task Management**:
-  - `pcheck add -m "Task description"` - Add a new task
-  - `pcheck check <id>` - Toggle a task by its ID
-  - `pcheck validate` - Check TODO.md formatting
+- **Task Tracking**: Orchestrator mode automatically uses `pcheck` for TODO.md management
 
 ### Web Search Tool (Gemini CLI)
 
